@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volatility Metrics</title>
+    <style>
+        @font-face {
+            font-family: "Quasimoda";
+            font-display: swap;
+            src: url("https://hs.sitelaunch.co.za/wp-content/uploads/et-fonts/Quasimoda3.ttf") format("truetype");
+        }
+        @font-face {
+            font-family: "Quasimoda light";
+            font-display: swap;
+            src: url("https://hs.sitelaunch.co.za/wp-content/uploads/et-fonts/quasimoda-light.otf") format("opentype");
+        }
+        body {
+            font-family: 'Quasimoda', sans-serif;
+            font-size: 13px;
+        }
+      	body:not(.et-tb) #main-content .performance-portfolio-container .container,
+				body:not(.et-tb-has-header) #main-content .performance-portfolio-container .container {
+    			padding-top: 0 !important; /* Remove the top padding */
+				}
+        .performance-portfolio-container {
+            margin: 0 auto;
+            max-width: 1200px;
+            padding: 10px;
+        }
+        .performance-portfolio-container .container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+          	width: 100%;
+          	height: 100%;
+          	gap: 20px;
+          	padding-top: 0;
+            margin-top: 0;
+        }
+        .performance-portfolio-container .section {
+            width: 50%;
+          	margin: 10px;
+          	padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .performance-portfolio-container table {
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin: auto;
+            width: 100%;
+        }
+        .performance-portfolio-container th, .performance-portfolio-container td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        .performance-portfolio-container th {
+            background-color: #f2f2f2;
+        }
+        .performance-portfolio-container .metric-header { background-color: white; }
+        .performance-portfolio-container .portfolio-header {
+            background-color: lightblue;
+            height: 85px;
+            }
+        .performance-portfolio-container .portfolio-weight-header { background-color: lightgreen; }
+        .performance-portfolio-container .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .performance-portfolio-container .slider-container {
+            text-align: center;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .performance-portfolio-container .slider-wrapper {
+            display: inline-block;
+            margin: 0 10px;
+        }
+        .performance-portfolio-container .slider-label {
+            margin-right: 10px;
+        }
+        .performance-portfolio-container .slider-value {
+            margin-left: 10px;
+            width: 50px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .performance-portfolio-container input[type="range"] {
+            appearance: none;
+            width: 200px;
+            height: 8px;
+            background: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .performance-portfolio-container input[type="range"]::-webkit-slider-thumb,
+        .performance-portfolio-container input[type="range"]::-moz-range-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .performance-portfolio-container canvas {
+            width: 100%;
+            max-width: 1000px;
+            height: 400px;
+        }
+        .performance-portfolio-container h2.chart-title,
+        .performance-portfolio-container h2.table-title {
+            font-size: 20px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .performance-portfolio-container h2.table-title {
+            margin-bottom: 50px;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: gray;
+            color: #fff;
+            text-align: center;
+            font-size: 13px;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip .info-icon {
+            margin-right: 5px;
+            color: blue;
+            font-size: 20px;
+            vertical-align: middle;
+        }
+        .label-text {
+            font-size: 16px;
+          	color: black;
+          	font-weight: bold;
+            border-bottom: 1px dotted blue;
+        }
+        .performance-portfolio-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slider-container {
+            margin-bottom: 20px; /* Add some spacing below sliders */
+        }
+
+        .chart-and-table-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 20px;
+        }
+
+        .chart-section, .table-section {
+            width: 50%;
+        }
+
+        /* Mobile Styles */
+        @media screen and (max-width: 768px) {
+            .chart-and-table-container {
+                flex-direction: column;
+            }
+            .chart-section, .table-section {
+                width: 100%;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@^3.0.0"></script>
+</head>
+<body data-rsssl=1 data-rsssl=1 data-rsssl=1 data-rsssl=1 data-rsssl=1 data-rsssl=1 data-rsssl=1>
+<div class="performance-portfolio-container">
+    <div class="slider-container">
+        <div class="slider-wrapper">
+            <span class="slider-label tooltip">
+                <span class="info-icon">ℹ️</span>
+                <span class="label-text">Time Period:</span>
+                <span class="tooltiptext">Use this slider to adjust the time period of the data</span>
+            </span>
+            <input type="range" id="portfolio-time-period-slider" min="1" max="5" step="1" value="5">
+            <span id="portfolio-time-period-value" class="slider-value">5 Years</span>
+        </div>
+        <div class="slider-wrapper">
+            <span class="slider-label tooltip">
+                <span class="info-icon">ℹ️</span>
+                <span class="label-text">Weight:</span>
+                <span class="tooltiptext">Use this slider to change the weight of High Street in the portfolio</span>
+            </span>
+            <input type="range" id="portfolio-weight-slider" min="0" max="100" step="10" value="30">
+            <span id="portfolio-weight-value" class="slider-value">30%</span>
+        </div>
+    </div>
+
+    <div class="chart-and-table-container">
+        <div class="chart-section">
+            <h2 id="portfolio-chart-title" class="chart-title">Total Return (5 Years)</h2>
+            <div id="chart-container">
+                <canvas id="portfolio-line-chart"></canvas>
+            </div>
+            <div id="custom-legend-container" style="text-align: center; margin-top: 20px; margin-left: 33px;"></div>
+        </div>
+
+        <div class="table-section">
+            <h2 id="portfolio-table-title" class="table-title">Volatility-Adjusted Metrics (5 Years)</h2>
+            <div id="portfolio-table-container">
+                <div id="portfolio-table"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="portfolio-error-message" class="error-message"></div>
+</div>
+
+<script>
+    let myLineChart;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('portfolio-time-period-slider').addEventListener('input', function() {
+            document.getElementById('portfolio-time-period-value').textContent = this.value + ' year' + (this.value > 1 ? 's' : '');
+            document.getElementById('portfolio-chart-title').textContent = 'Total Return (' + this.value + ' Year' + (this.value > 1 ? 's' : '') + ')';
+            document.getElementById('portfolio-table-title').textContent = 'Volatility-Adjusted Metrics (' + this.value + ' Year' + (this.value > 1 ? 's' : '') + ')';
+            updateData();
+        });
+
+        document.getElementById('portfolio-weight-slider').addEventListener('input', function() {
+            document.getElementById('portfolio-weight-value').textContent = this.value + '%';
+            updateData();
+        });
+
+        updateData(); // Initial call to populate data
+    });
+
+    function updateData() {
+        const timePeriod = document.getElementById('portfolio-time-period-slider').value;
+        const weight = document.getElementById('portfolio-weight-slider').value;
+        const key = `${timePeriod}_${weight}`;
+
+        fetchData('volatility_table_data.json', data => {
+            const tableData = data[key];
+            if (tableData) {
+                renderTable('portfolio-table', tableData.top_metrics, 'top');
+                showError('');
+            } else {
+                document.getElementById('portfolio-table').innerHTML = 'No data available for the selected time period and weight.';
+                showError('No data available for the selected time period and weight.');
+            }
+        });
+
+        fetchData('volatility_chart_data.json', data => {
+            const chartData = data[key];
+            if (chartData) {
+                updateChart(chartData);
+                showError('');
+            } else {
+                document.getElementById('portfolio-line-chart').innerHTML = 'No data available for the selected time period and weight.';
+                showError('No data available for the selected time period and weight.');
+            }
+        });
+    }
+
+    function fetchData(url, callback) {
+        fetch(`https://raw.githubusercontent.com/charlie-HSAM/HSAM_LB_Volatility/main/${url}`)
+            .then(response => response.json())
+            .then(callback)
+            .catch(error => {
+                console.error(`Error fetching data from ${url}:`, error);
+                showError(`Error fetching data.`);
+            });
+    }
+
+    function showError(message) {
+        document.getElementById('portfolio-error-message').textContent = message;
+    }
+
+    function renderTable(elementId, data, type) {
+        const weightValue = document.getElementById('portfolio-weight-value').textContent;
+        const headerText = weightValue === '100%' ? 'High Street' : `Portfolio of 4 Largest Funds & ${weightValue} High Street`;
+        const headers = [
+            { text: 'Key Metrics', class: 'metric-header' },
+            { text: 'Portfolio of 4 Largest Funds', class: 'portfolio-header' },
+            { text: headerText, class: 'portfolio-weight-header' }
+        ];
+        let tableHTML = '<table><tr>';
+        headers.forEach(header => {
+            tableHTML += `<th class="${header.class}">${header.text}</th>`;
+        });
+        tableHTML += '</tr>';
+
+        for (const [metric, values] of Object.entries(data)) {
+            if (metric !== 'Downside Deviation') {
+                tableHTML += `<tr><td class="metric-header">${metric}</td>${values.slice(2).map(value => `<td>${formatValue(value, metric, type)}</td>`).join('')}</tr>`;
+            }
+        }
+
+        tableHTML += '</table>';
+        document.getElementById(elementId).innerHTML = tableHTML;
+    }
+
+    function formatValue(value, metric, type) {
+        if (typeof value !== 'number') return value;
+        const formatPercent = num => `${(num * 100).toFixed(type === 'top' ? 1 : 0)}%`;
+        if (type === 'top') {
+            return ['Annual Return', 'Standard Deviation'].includes(metric) ? formatPercent(value) : value.toFixed(2);
+        } else {
+            return metric === 'Beta (to benchmark)' ? value.toFixed(2) : formatPercent(value);
+        }
+    }
+
+    function generateCustomLegend(chart) {
+        const legendContainer = document.getElementById('custom-legend-container');
+        legendContainer.innerHTML = ''; // Clear any previous legend
+
+        chart.data.datasets.forEach((dataset, index) => {
+            // Create a container for the legend item
+            const legendItem = document.createElement('div');
+            legendItem.style.display = 'flex';
+            legendItem.style.alignItems = 'center';
+            legendItem.style.marginBottom = '5px';
+            legendItem.style.cursor = 'pointer';
+
+            // Create the color box for the legend item
+            const colorBox = document.createElement('span');
+            colorBox.style.backgroundColor = dataset.borderColor;
+            colorBox.style.width = '20px';
+            colorBox.style.height = '20px';
+            colorBox.style.display = 'inline-block';
+            colorBox.style.marginRight = '10px';
+
+            // Create the label for the legend item
+            const label = document.createElement('span');
+            label.textContent = dataset.label;
+
+            // Add event listener for toggling dataset visibility
+            legendItem.addEventListener('click', () => {
+                const meta = chart.getDatasetMeta(index);
+                meta.hidden = !meta.hidden;
+                chart.update();
+            });
+
+            // Append the color box and label to the legend item
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(label);
+
+            // Append the legend item to the container
+            legendContainer.appendChild(legendItem);
+        });
+    }
+
+    function updateChart(chartData) {
+        const ctx = document.getElementById('portfolio-line-chart').getContext('2d');
+        const dates = chartData.dates.map(date => new Date(date));
+        const datasets = [
+            { label: 'High Street', data: chartData['HSAM LB Fund'], borderColor: '#DA7842', backgroundColor: '#DA7842', fill: false },
+            { label: 'Peer Average', data: chartData.Benchmark, borderColor: '#15273F', backgroundColor: '#15273F', fill: false },
+            { label: 'Portfolio of 4 Largest Funds', data: chartData['Largest 4 Funds (Equally Weighted)'], borderColor: 'lightblue', backgroundColor: 'lightblue', fill: false },
+            { label: `Portfolio of 4 Largest Funds & ${document.getElementById('portfolio-weight-value').textContent} High Street`, data: chartData['Largest 4 Funds (EW) + x% HSAM'], borderColor: 'lightgreen', backgroundColor: 'lightgreen', fill: false }
+        ];
+
+        if (myLineChart) {
+            myLineChart.data.labels = dates;
+            myLineChart.data.datasets = datasets;
+            myLineChart.update();
+        } else {
+            myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: dates, datasets },
+                options: {
+                    scales: {
+                        x: { type: 'time', time: { unit: 'year' }, grid: { display: false } },
+                        y: { grid: { display: false }, ticks: { callback: value => value } }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const date = tooltipItems[0].parsed.x;
+                                    return new Date(date).toLocaleDateString();
+                                }
+                            }
+                        }
+                    },
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+                    elements: { point: { radius: 0 } },
+                    animation: false
+                }
+            });
+        }
+        // Generate the custom legend
+        generateCustomLegend(myLineChart);
+    }
+</script>
+</body>
+</html>

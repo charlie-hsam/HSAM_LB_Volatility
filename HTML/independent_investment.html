@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Independent Investment</title>
+<style>
+    @font-face {
+        font-family: "Quasimoda";
+        font-display: swap;
+        src: url("https://hs.sitelaunch.co.za/wp-content/uploads/et-fonts/Quasimoda3.ttf") format("truetype");
+    }
+    @font-face {
+        font-family: "Quasimoda light";
+        font-display: swap;
+        src: url("https://hs.sitelaunch.co.za/wp-content/uploads/et-fonts/quasimoda-light.otf") format("opentype");
+    }
+    body {
+        font-family: 'Quasimoda', sans-serif;
+        font-size: 13px; /* Change this value to adjust the global font size */
+    }
+    .overview-advanced-container {
+        margin: 0;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+    .overview-advanced-container .button-container {
+        margin-bottom: 20px;
+    }
+    .overview-advanced-container .button {
+        background-color: grey;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 0 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-size: 16px; /* Adjust button font size */
+    }
+    .overview-advanced-container .button.active {
+        background-color: green;
+    }
+    .overview-advanced-container .slider-container {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        margin-bottom: 20px;
+        white-space: nowrap; /* Ensure the content stays on one line */
+    }
+    .overview-advanced-container .slider-wrapper {
+        display: flex;
+        align-items: center;
+        width: 320px; /* Set a fixed width for the slider wrapper */
+    }
+    .overview-advanced-container .slider-label {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+    }
+    .overview-advanced-container .label-text {
+        margin-left: 5px;
+        font-weight: 600;
+        font-size: 16px;
+        color: #444;
+        text-decoration: underline 1px dotted blue;
+    }
+    .overview-advanced-container .slider-value {
+        margin-left: 10px;
+        width: 60px; /* Set a fixed width to prevent jumping */
+        display: inline-block;
+        text-align: left;
+    }
+    .overview-advanced-container .content {
+        display: none;
+    }
+    .overview-advanced-container .content.active {
+        display: block;
+    }
+    .overview-advanced-container .bar-chart {
+        display: flex;
+        justify-content: start;
+    }
+    .overview-advanced-container .bar-chart img {
+        max-width: 400px; /* Adjust the maximum width */
+        height: auto;
+        max-height: 300px; /* Set a maximum height */
+    }
+    .overview-advanced-container .advanced-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        width: 100%;
+        align-items: flex-start;
+    }
+    .overview-advanced-container .graph-container, .overview-advanced-container .table-container {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+    .overview-advanced-container .graph-container img {
+        max-width: 100%;
+        height: auto;
+    }
+    .overview-advanced-container table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+    .overview-advanced-container colgroup col {
+        width: 33%;
+    }
+    .overview-advanced-container table, .overview-advanced-container th, .overview-advanced-container td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+    }
+    .overview-advanced-container .hsam-header {
+        background-color: #DA7842;
+        color: white;
+    }
+    .overview-advanced-container .benchmark-header {
+        background-color: #15273F;
+        color: white;
+    }
+    .overview-advanced-container input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%; /* Ensure the slider fills the wrapper width */
+        height: 8px;
+        background: #ddd; /* Gray bar */
+        border-radius: 5px;
+        outline: none;
+        opacity: 0.7;
+        transition: opacity .15s ease-in-out;
+        margin: 0 10px; /* Ensure consistent spacing */
+    }
+    .overview-advanced-container input[type="range"]:hover {
+        opacity: 1;
+    }
+    .overview-advanced-container input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #007bff; /* Blue thumb */
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    .overview-advanced-container input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #007bff; /* Blue thumb */
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    .overview-advanced-container .description-text-1 {
+        text-align: left !important;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        max-width: 1000px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 14px; /* Change this value to adjust the font size of description texts */
+    }
+    .overview-advanced-container .description-text-2 {
+        text-align: left !important;
+        margin-top: 10px;
+        margin-bottom: 50px;
+        font-size: 14px; /* Change this value to adjust the font size of description texts */
+    }
+    .overview-advanced-container .description-text-3 {
+        text-align: left !important;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-size: 14px; /* Change this value to adjust the font size of description texts */
+    }
+    .overview-advanced-container h3.title-1 {
+        font-size: 20px;
+        text-align: left !important;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .overview-advanced-container h3.title-2 {
+        font-size: 20px;
+        text-align: left !important;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .overview-advanced-container h3.title-3 {
+        font-size: 20px;
+        text-align: left !important;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: gray;
+        color: #fff;
+        text-align: center;
+        font-size: 13px;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 10;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        white-space: normal;
+    }
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    .tooltip .info-icon {
+        margin-right: 5px;
+        color: blue;
+        font-size: 18px;
+        vertical-align: middle;
+    }
+    .overview-advanced-container .button.active {
+        background-color: transparent !important;
+        color: #8dca41 !important;
+        border: 3px solid #8dca41 !important;
+    }
+    .overview-advanced-container .button.active:hover {
+        background-color: #8dca41 !important;
+        color: #ffffff !important;
+        border: 3px solid #8dca41 !important;
+    }
+    .overview-advanced-container .button {
+        background-color: transparent !important;
+        color: #3cabee !important;
+        border: 3px solid #3cabee !important;
+    }
+    .overview-advanced-container .button:hover {
+        background-color: #3cabee !important;
+        color: #ffffff !important;
+        border: 3px solid #3cabee !important;
+    }
+    /* Responsive layout - makes a one column layout instead of a two-column layout */
+
+    @media (max-width: 800px) {
+        .overview-advanced-container .advanced-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            width: 100% !important;
+        }
+        .overview-advanced-container table,
+        .overview-advanced-container th,
+        .overview-advanced-container td {
+            padding: 5px !important;
+        }
+        .overview-advanced-container .graph-container,
+        .overview-advanced-container .table-container {
+            width: 100%!important;
+        }
+        .overview-advanced-container .button-container {
+            margin-top: 50px!important;
+        }
+        .overview-advanced-container .bar-chart img {
+            max-width: 100% !important;
+        }
+        .overview-advanced-container table, .overview-advanced-container th, .overview-advanced-container td {
+            border: 1px solid #eee !important;
+        }
+        .overview-advanced-container .info-icon {
+            display: none;
+        }
+        .overview-advanced-container .slider-label {
+            align-items: left;
+        }
+        .overview-advanced-container .description-text-2 {
+            margin-bottom: 20px;
+        }
+        .overview-advanced-container h3.title-3 {
+            margin-top: 20px;
+        }
+}
+</style>
+</head>
+<body data-rsssl=1>
+    <div class="overview-advanced-container">
+        <div class="button-container">
+            <button id="independent-overviewButton" class="button active" onclick="showOverview()">Overview</button>
+            <button id="independent-advancedButton" class="button" onclick="showAdvanced()">Detailed Analysis</button>
+        </div>
+        <div id="independent-overviewContent" class="content active">
+            <h3 class="title-1">Target return objective success rate*</h3>
+            <div class="description-text-1">
+                Using rolling one-year returns to assess the level of risk produces significantly different results versus using volatility. Historically, High Street Balanced Prescient Fund investors surpassed the target return objective 64% of the time compared to the peer average of 36%. Further, the Fund has produced superior volatility-adjusted returns since inception.
+            </div>
+            <div class="bar-chart">
+                <img src="https://hsam.co.za/wp-content/uploads/2024/10/HSAM-vs-Peers-vs-inflation-Q3-2024.png" alt="Overview Bar Chart">
+            </div>
+        </div>
+        <div id="independent-advancedContent" class="content">
+            <div class="advanced-content">
+                <div class="table-container">
+                  <h3 class="title-2">Volatility-adjusted metrics</h3>
+                    <div class="description-text-2">
+                        For those who prefer to use volatility as their primary or sole measure of risk, despite exhibiting a higher volatility, the Fund has produced superior volatility-adjusted returns since inception.
+                    </div>
+                    <div class="slider-container active" id="independent-sliderContainer">
+                        <div class="slider-wrapper">
+                            <span class="slider-label tooltip">
+                                <span class="info-icon">ℹ️</span>
+                                <span class="label-text">Time Period:</span>
+                                <span class="tooltiptext">Use this slider to adjust the time period of the data</span>
+                            </span>
+                            <input type="range" id="independent-time-period-slider" min="1" max="5" step="1" value="5">
+                            <span id="independent-time-period-value" class="slider-value">5 Years</span>
+                        </div>
+                    </div>
+                    <table id="independent-metricsTable">
+                        <colgroup>
+                            <col style="width: 40%;">
+                            <col style="width: 30%;">
+                            <col style="width: 30%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Key Metrics</th>
+                              	<th class="benchmark-header">Peer Average</th>
+                                <th class="hsam-header">High Street</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="graph-container">
+                    <h3 class="title-3">Distribution of 1 year rolling returns</h3>
+                    <div class="description-text-3">
+                        The Fund return distribution chart has a favourable negative skew with an annualised mean and median return of 14.5% and 18.2% respectively, above the target return of 10.0%. Considering the peer average, the distributions are normally distributed with an annualised mean and median return of 9.1% and 8.5% respectively. The distribution charts will be updated using rolling five-year data points to align with the Fund’s recommended holding period when an adequate amount of historical data becomes available.
+                    </div>
+                    <img src="https://hsam.co.za/wp-content/uploads/2024/10/Rolling-Returns-as-of-Q3-2024.png">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let preloadedData = {};
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await preloadData();
+            showOverview();
+            document.getElementById('independent-time-period-slider').addEventListener('input', updateTable); // Add event listener
+        });
+
+        async function preloadData() {
+            const response = await fetch('https://raw.githubusercontent.com/charlie-hsam/HSAM_LB_Volatility/main/volatility_table_data.json');
+            preloadedData = await response.json();
+        }
+
+        function showOverview() {
+            document.getElementById("independent-overviewButton").classList.add("active");
+            document.getElementById("independent-advancedButton").classList.remove("active");
+            document.getElementById("independent-overviewContent").classList.add("active");
+            document.getElementById("independent-advancedContent").classList.remove("active");
+            document.getElementById("independent-sliderContainer").classList.remove("active");
+        }
+
+        function showAdvanced() {
+            document.getElementById("independent-overviewButton").classList.remove("active");
+            document.getElementById("independent-advancedButton").classList.add("active");
+            document.getElementById("independent-overviewContent").classList.remove("active");
+            document.getElementById("independent-advancedContent").classList.add("active");
+            document.getElementById("independent-sliderContainer").classList.add("active");
+            updateTable();
+        }
+
+        function updateTable() {
+            const timePeriod = document.getElementById('independent-time-period-slider').value;
+            document.getElementById('independent-time-period-value').innerText = `${timePeriod} year${timePeriod > 1 ? 's' : ''}`;
+
+            const periodKey = `${timePeriod}_0`; // Assuming the weight is always 0
+
+            const metrics = {
+                "Annual Return": preloadedData[periodKey]["top_metrics"]["Annual Return"],
+                "Standard Deviation": preloadedData[periodKey]["top_metrics"]["Standard Deviation"],
+                "Sharpe Ratio": preloadedData[periodKey]["top_metrics"]["Sharpe Ratio"],
+                "Sortino Ratio": preloadedData[periodKey]["top_metrics"]["Sortino Ratio"],
+                "Correlation to Benchmark": preloadedData[periodKey]["top_metrics"]["Correlation to Benchmark"],
+                "Beta to benchmark": preloadedData[periodKey]["advanced_metrics"]["Beta to benchmark"],
+                "Treynor Ratio": preloadedData[periodKey]["advanced_metrics"]["Treynor Ratio"],
+                "Jensen's Alpha": preloadedData[periodKey]["advanced_metrics"]["Jensen's Alpha"]
+            };
+
+            const tableBody = document.querySelector('#independent-metricsTable tbody');
+            tableBody.innerHTML = ''; // Clear any existing rows
+
+            Object.keys(metrics).forEach(metric => {
+                const row = document.createElement('tr');
+                const metricCell = document.createElement('td');
+                metricCell.textContent = metric;
+                row.appendChild(metricCell);
+
+                const benchmarkCell = document.createElement('td');
+                const benchmarkValue = ["Correlation to Benchmark", "Beta to benchmark", "Treynor Ratio", "Jensen's Alpha"].includes(metric) ? "-" : metrics[metric][1];
+                benchmarkCell.textContent = formatValue(benchmarkValue, metric, 'top');
+                row.appendChild(benchmarkCell);
+
+              	const hsamCell = document.createElement('td');
+                hsamCell.textContent = formatValue(metrics[metric][0], metric, 'top');
+                row.appendChild(hsamCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function formatValue(value, metric, type) {
+            if (typeof value !== 'number') return value;
+            const formatPercent = num => `${(num * 100).toFixed(type === 'top' ? 1 : 0)}%`;
+            if (type === 'top') {
+                return ['Annual Return', 'Standard Deviation', 'Downside Deviation'].includes(metric) ? formatPercent(value) : value.toFixed(2);
+            } else {
+                return metric === 'Beta (to benchmark)' ? value.toFixed(2) : formatPercent(value);
+            }
+        }
+    </script>
+</body>
+</html>
