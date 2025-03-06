@@ -1,7 +1,7 @@
 import json
 import xlwings as xw
 from datetime import datetime
-from update_and_upload_data import TIME_PERIOD, WEIGHT_END, WEIGHT_STEP
+from config import TIME_PERIOD, WEIGHT_END, WEIGHT_STEP
 
 WB_PATH = (r"C:\Users\cdela\High Street Asset Management\High Street - AA) High Street Asset Management\Marketing\LB "
            r"Risk-Adjusted Metrics\Local Balanced & Top 4 Peers Risk Metrics.xlsx")
